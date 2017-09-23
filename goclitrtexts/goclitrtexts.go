@@ -62,17 +62,18 @@ func ListIssues() {
 func ListCompleted() {
 	tasks := goclitrjson.DecodeTask(".goclitr/completed.json")
 
+	table := "%2s %-10s  %-10s %-30s %-10s"
 	headline := color.New(color.Underline)
-	headline.Printf("%2s %-10s %-30s %-10s %-8s", "ID", "Duration", "Description", "User", "Progress")
+	headline.Printf(table, "ID", "Entry", "Duration", "Description", "User")
 	unequal := color.New(color.BgYellow, color.FgBlack)
 
 	for i, p := range tasks {
 		age := p.Modified[len(p.Modified)-1] - p.Entry
 		fmt.Println("")
 		if i%2 == 1 {
-			fmt.Printf("%2s %-10s %-30s %-10s %8s", fmt.Sprint(i), jbasefuncs.ReadableTime(age, true), p.Description, p.User, fmt.Sprint(p.Progress))
+			fmt.Printf(table, fmt.Sprint(i), time.Unix(p.Entry, 0).Format("2006-01-02"), jbasefuncs.ReadableTime(age, true), p.Description, p.User)
 		} else {
-			unequal.Printf("%2s %-10s %-30s %-10s %8s", fmt.Sprint(i), jbasefuncs.ReadableTime(age, true), p.Description, p.User, fmt.Sprint(p.Progress))
+			unequal.Printf(table, fmt.Sprint(i), time.Unix(p.Entry, 0).Format("2006-01-02"), jbasefuncs.ReadableTime(age, true), p.Description, p.User)
 		}
 	}
 	fmt.Println("")
