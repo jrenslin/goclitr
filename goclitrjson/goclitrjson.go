@@ -55,11 +55,17 @@ func DecodeTask(filename string) []Task {
 	return data
 }
 
-// Function for appending a folder to the user's list.
-// Should be included in any successfully executed function that does change contents to the current dir.
+// Function for appending a task to the local task list.
 func AppendTask(filename string, toappend Task) {
 	data := DecodeTask(filename)
 	data = append(data, toappend)
+	jbasefuncs.File_put_contents(filename, ToJson(data))
+}
+
+// Function for deleting a folder from the user's list.
+func RemoveTask(filename string, key int) {
+	data := DecodeTask(filename)
+	data = append(data[:key], data[key+1:]...)
 	jbasefuncs.File_put_contents(filename, ToJson(data))
 }
 

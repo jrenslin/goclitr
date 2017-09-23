@@ -11,15 +11,15 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"sort"
+	"strconv"
 	"time"
 )
 
-type Settings struct {
-	Time string
-	User string
-	Dir  string
-}
-
+// Function to always be run when goclitr is run. Sets up goclitr's folder in the user's .config directory.
+// Creates two files there:
+// - config.json is the config file. So far nothing can be configured there however. To be implemented.
+// - dirs.json is where the different folders (here synonymous with projects) the user has used goclitr in are listed.
 func ensure_working_environment() {
 	user, _ := user.Current()
 	jbasefuncs.EnsureDir(user.HomeDir + "/.config/goclitr")
@@ -27,37 +27,57 @@ func ensure_working_environment() {
 	jbasefuncs.EnsureJson(user.HomeDir + "/.config/goclitr/dirs.json")
 }
 
+func addDirtoList() {
+	user, _ := user.Current()                                                    // Get current user information
+	dir, _ := os.Getwd()                                                         // Get filepath of current folder
+	goclitrjson.AppendFolderList(user.HomeDir+"/.config/goclitr/dirs.json", dir) // Write cur. dir to list
+	fmt.Println("Initialized at " + dir)                                         // Notify the user.
+}
+
+// Function to initialize goclitr in+for this folder.
 func initialize() {
+	// Create the required files and folder at .goclitr.
 	jbasefuncs.EnsureDir(".goclitr")
 	jbasefuncs.EnsureJsonList(".goclitr/pending.json")
 	jbasefuncs.EnsureJsonList(".goclitr/completed.json")
-
-	// Get user info
-	user, _ := user.Current()
-	dir, _ := os.Getwd()
-	goclitrjson.AppendFolderList(user.HomeDir+"/.config/goclitr/dirs.json", dir)
-
-	fmt.Println("Initialized at " + dir)
+	addDirtoList()
 }
 
+// Function to add new tasks. Creates the task and passes the json-related work to AppendTask from goclitrjson.go.
 func addTask(args []string) {
-	description := jbasefuncs.JoinSlice(" ", args)
-	username, _ := user.Current()
+	description := jbasefuncs.JoinSlice(" ", args) // Join arguments to description string.
+	username, _ := user.Current()                  // Get username to later store it.
 
 	newtask := goclitrjson.Task{Description: description, User: username.Username, Entry: time.Now().Unix()}
 	goclitrjson.AppendTask(".goclitr/pending.json", newtask)
 }
 
+// Function to delete a task by ID.
+// More than one ID can be passed to delete more than one task with one command.
+func removeTask(args []string) {
+
+	// First, get all arguments and convert them to integers to be
+	// passed on to deletion function from goclitrjson.go.
+	ids := []int{}
+	for _, argument := range args {
+		arg, err := strconv.Atoi(argument)
+		if err != nil {
+			fmt.Println("One of the arguments you provided could not be converted to int.")
+			os.Exit(1)
+		}
+		ids = append(ids, arg)
+	}
+	sort.Sort(sort.Reverse(sort.IntSlice(ids))) // Sort in reverse order.
+
+	for _, id := range jbasefuncs.ArrayIntUnique(ids) { // Remove duplicates for loop
+		goclitrjson.RemoveTask(".goclitr/pending.json", id)
+		fmt.Println("Removed task #" + fmt.Sprint(id))
+	}
+}
+
 // -----------------
 // Main: Handle command line inputs
 // -----------------
-
-func Ausgelager() {
-	pwd, err := os.Getwd()
-	jbasefuncs.Check(err)
-	Settings := Settings{User: "X", Time: time.Now().Format(time.RFC850), Dir: pwd}
-	fmt.Println(Settings)
-}
 
 func main() {
 	ensure_working_environment()
@@ -77,14 +97,11 @@ func main() {
 		goclitrtexts.ListProjects()
 	} else if jbasefuncs.HandleCmdInput(args, []string{"add"}) {
 		addTask(args[1:])
+	} else if jbasefuncs.HandleCmdInput(args, []string{"remove"}) ||
+		jbasefuncs.HandleCmdInput(args, []string{"delete"}) {
+		removeTask(args[1:])
 	} else {
 		fmt.Println("Unknown command: " + args[0])
 	}
-
-	/*
-		A := []string{"hi"}
-		b := "hia"
-		a = append(a, b)
-	*/
 
 }
