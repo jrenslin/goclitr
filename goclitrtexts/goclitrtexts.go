@@ -13,18 +13,24 @@ import (
 func PrintHelp() {
 	fmt.Println("Goclitr v.0.1 \n ")
 
+	table := "%-12s %-4s %-12s %-20s \n"
 	headline := color.New(color.Underline)
-	headline.Printf("%-12s %-12s %-20s \n", "Command", "", "Description")
-	fmt.Printf("%-12s %-12s %-20s \n", "init", "", "Initialize")
-	fmt.Printf("%-12s %-12s %-20s \n", "current", "", "Lists currently active (=not completed) issues")
-	fmt.Printf("%-12s %-12s %-20s \n", "listall", "", "Lists all projects you've worked on")
-	fmt.Printf("%-12s %-12s %-20s \n", "help", "", "Print this message")
-	fmt.Printf("%-12s %-12s %-20s \n", "add", "", "Add a task")
-	fmt.Printf("%-12s %-12s %-20s \n", "new", "", "Same as add")
-	fmt.Printf("%-12s %-12s %-20s \n", "delete", "<ID>", "Delete task with the given ID")
-	fmt.Printf("%-12s %-12s %-20s \n", "remove", "<ID>", "Same as delete")
-	fmt.Printf("%-12s %-12s %-20s \n", "modify", "<ID>", "Modify the task's text")
-	fmt.Printf("%-12s %-12s %-20s \n", "progress", "<ID>", "Edit progress of the task's text")
+	headline.Printf(table, "Command", "", "", "Description")
+	fmt.Printf(table, "init", "", "", "Initialize")
+	fmt.Printf(table, "teardown", "", "", "Tear down")
+	fmt.Printf(table, "current", "", "", "Lists currently active (=not completed) issues")
+	fmt.Printf(table, "listall", "", "", "Lists all projects you've worked on")
+	fmt.Printf(table, "help", "", "", "Print this message")
+	fmt.Printf(table, "list", "", "", "List current tasks")
+	fmt.Printf(table, "completed", "", "", "List completed")
+	fmt.Printf(table, "add", "<text>", "", "Add a task")
+	fmt.Printf(table, "new", "", "", "Same as add")
+	fmt.Printf(table, "delete", "<ID>", "", "Delete task with the given ID")
+	fmt.Printf(table, "remove", "<ID>", "", "Same as delete")
+	fmt.Printf(table, "modify", "<ID>", "<text>", "Modify the task's text")
+	fmt.Printf(table, "progress", "<ID>", "<int: 1-10>", "Edit progress of the task's text")
+	fmt.Printf(table, "done", "<ID>", "", "Finish task")
+	fmt.Printf(table, "completed", "<ID>", "", "Finish task")
 
 }
 
@@ -58,14 +64,12 @@ func ListCompleted() {
 	headline.Printf("%2s %-10s %-30s %-10s %-8s", "ID", "Duration", "Description", "User", "Progress")
 	unequal := color.New(color.BgYellow, color.FgBlack)
 
-	//	fmt.Println(tasks)
 	for i, p := range tasks {
 		age := p.Modified[len(p.Modified)-1] - p.Entry
+		fmt.Println("")
 		if i%2 == 1 {
-			fmt.Println("")
 			fmt.Printf("%2s %-10s %-30s %-10s %8s", fmt.Sprint(i), jbasefuncs.ReadableTime(age, true), p.Description, p.User, fmt.Sprint(p.Progress))
 		} else {
-			fmt.Println("")
 			unequal.Printf("%2s %-10s %-30s %-10s %8s", fmt.Sprint(i), jbasefuncs.ReadableTime(age, true), p.Description, p.User, fmt.Sprint(p.Progress))
 		}
 	}
