@@ -41,9 +41,10 @@ func initialize() {
 }
 
 func addTask(args []string) {
-	name := jbasefuncs.JoinSlice(" ", args)
+	description := jbasefuncs.JoinSlice(" ", args)
+	username, _ := user.Current()
 
-	newtask := goclitrjson.Task{Description: name}
+	newtask := goclitrjson.Task{Description: description, User: username.Username, Entry: time.Now().Unix()}
 	goclitrjson.AppendTask(".goclitr/pending.json", newtask)
 }
 
@@ -74,10 +75,12 @@ func main() {
 		goclitrtexts.ListProjects()
 	} else if jbasefuncs.HandleCmdInput(args, []string{"add"}) {
 		addTask(args[1:])
+	} else {
+		fmt.Println("Unknown command: " + args[0])
 	}
 
 	/*
-		a := []string{"hi"}
+		A := []string{"hi"}
 		b := "hia"
 		a = append(a, b)
 	*/

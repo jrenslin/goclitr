@@ -2,6 +2,7 @@ package goclitrtexts
 
 import (
 	"../goclitrjson"
+	"../jbasefuncs"
 	"fmt"
 	color "github.com/fatih/color"
 	"os/user"
@@ -22,11 +23,16 @@ func ListIssues() {
 	tasks := goclitrjson.DecodeTask(".goclitr/pending.json")
 
 	headline := color.New(color.Underline)
-	headline.Printf("%-20s %-20s %-20s \n", "Name", "Age", "")
+	headline.Printf("%-6s %-8s %-30s", "ID", "Age", "Description")
+	unequal := color.New(color.BgYellow, color.FgBlack)
 
-	for _, p := range tasks {
-		age, _ := time.Parse()
-		fmt.Printf("%-20s %-20s %-20s \n", p.Description, "", "")
+	for i, p := range tasks {
+		age := time.Now().Unix() - p.Entry
+		if i%2 == 1 {
+			fmt.Printf("\n%-6s %-8s %-30s \n", fmt.Sprint(i), jbasefuncs.ReadableTime(age, true), p.Description)
+		} else {
+			unequal.Printf("\n%-6s %-8s %-30s", fmt.Sprint(i), jbasefuncs.ReadableTime(age, true), p.Description)
+		}
 	}
 }
 

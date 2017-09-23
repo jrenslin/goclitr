@@ -32,9 +32,9 @@ type Task struct {
 	User        string `json:"user"`
 	Uuid        string `json:"uuid"`
 	Status      string `json:"status"`
-	Entry       int    `json:"entry"`
-	End         int    `json:"end"`
-	Due         int    `json:"due"`
+	Entry       int64  `json:"entry"`
+	End         int64  `json:"end"`
+	Due         int64  `json:"due"`
 	Progress    string `json:"progress"`
 	Annotation  string `json:"annotation"`
 	Modified    []int  `json:"modified"`
