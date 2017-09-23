@@ -71,6 +71,8 @@ func main() {
 		goclitrtexts.ListIssues()
 	} else if jbasefuncs.HandleCmdInput(args, []string{"init"}) {
 		initialize()
+	} else if jbasefuncs.HandleCmdInput(args, []string{"help"}) {
+		goclitrtexts.PrintHelp()
 	} else if jbasefuncs.HandleCmdInput(args, []string{"listall"}) {
 		goclitrtexts.ListProjects()
 	} else if jbasefuncs.HandleCmdInput(args, []string{"add"}) {
