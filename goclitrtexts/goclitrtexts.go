@@ -1,3 +1,4 @@
+// This file provides functions that mainly contain strings for outputs in goclitr.
 package goclitrtexts
 
 import (
@@ -9,7 +10,7 @@ import (
 	"time"
 )
 
-//
+// Help text
 func PrintHelp() {
 	fmt.Println("Goclitr v.0.1 \n ")
 
@@ -19,7 +20,6 @@ func PrintHelp() {
 	fmt.Printf(table, "init", "", "", "Initialize")
 	fmt.Printf(table, "teardown", "", "", "Tear down")
 	fmt.Printf(table, "current", "", "", "Lists currently active (=not completed) issues")
-	fmt.Printf(table, "listall", "", "", "Lists all projects you've worked on")
 	fmt.Printf(table, "help", "", "", "Print this message")
 	fmt.Printf(table, "list", "", "", "List current tasks")
 	fmt.Printf(table, "completed", "", "", "List completed")
@@ -31,6 +31,8 @@ func PrintHelp() {
 	fmt.Printf(table, "progress", "<ID>", "<int: 1-10>", "Edit progress of the task's text")
 	fmt.Printf(table, "done", "<ID>", "", "Finish task")
 	fmt.Printf(table, "completed", "<ID>", "", "Finish task")
+	fmt.Printf(table, "listall", "", "", "Lists all projects you've worked on")
+	fmt.Printf(table, "project", "<Project ID>", "", "Return path of project X")
 
 }
 

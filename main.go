@@ -117,6 +117,20 @@ func tearDown() {
 	fmt.Println("Removed local directory from your project list.")
 }
 
+// Function to just output path of a project specified by ID
+// Unfortunately making the terminal go to the directory from Go seems to be impossible.
+// By returning the path, this function makes it easy to jump projects with a little bash.
+// E.g.:
+// cd `~/Sync/Programming/Golang/goclitr/goclitr goto 1`
+
+func showProjectDir(args []string) {
+	user, _ := user.Current()
+	folders := goclitrjson.DecodeFolderList(user.HomeDir + "/.config/goclitr/dirs.json")
+	key, _ := strconv.Atoi(args[0])
+	targetDir := folders[key]
+	fmt.Println(targetDir)
+}
+
 // -----------------
 // Main: Handle command line inputs
 // -----------------
@@ -149,6 +163,8 @@ func main() {
 		addTask(args[1:])
 	} else if jbasefuncs.HandleCmdInput(args, []string{"modify"}) {
 		modifyTask(args[1:], "description")
+	} else if len(args) == 2 && args[0] == "project" {
+		showProjectDir(args[1:])
 	} else if (len(args) == 3 && args[0] == "progress" && args[3] == "10") ||
 		(len(args) == 2 && args[0] == "done") ||
 		(len(args) == 2 && args[0] == "complete") {
