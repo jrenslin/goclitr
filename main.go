@@ -52,6 +52,34 @@ func addTask(args []string) {
 	goclitrjson.AppendTask(".goclitr/pending.json", newtask)
 }
 
+// Function for modifying tasks
+func modifyTask(args []string, tomodify string) {
+	// Convert the first left over argument to int
+	id, err := strconv.Atoi(args[0])
+	if err != nil {
+		fmt.Println("You did not provide a valid ID.")
+		os.Exit(1)
+	}
+	description := jbasefuncs.JoinSlice(" ", args[1:]) // Join arguments to description string.
+	if goclitrjson.ModifyTask(".goclitr/pending.json", id, tomodify, description) {
+		fmt.Println("Modified: " + tomodify + " >> " + args[1])
+	}
+}
+
+// Function for modifying tasks
+func finishTask(args []string) {
+	// Convert the first left over argument to int
+	id, err := strconv.Atoi(args[0])
+	if err != nil {
+		fmt.Println("You did not provide a valid ID.")
+		os.Exit(1)
+	}
+	if goclitrjson.ModifyTask(".goclitr/pending.json", id, "progress", "10") {
+		fmt.Println("Modified: progress >> 10")
+	}
+	goclitrjson.MoveTask(".goclitr/pending.json", ".goclitr/completed.json", id)
+}
+
 // Function to delete a task by ID.
 // More than one ID can be passed to delete more than one task with one command.
 func removeTask(args []string) {
@@ -75,6 +103,20 @@ func removeTask(args []string) {
 	}
 }
 
+// Function to tear down local tasklist.
+func tearDown() {
+	if jbasefuncs.FileExists(".goclitr") == false {
+		jbasefuncs.Die("There is nothing to tear down here.")
+	}
+	os.RemoveAll(".goclitr/")
+	fmt.Println("Removed .goclitr directory.")
+
+	user, _ := user.Current() // Get username to later store it.
+	dir, _ := os.Getwd()      // Get filepath of current folder
+	goclitrjson.DeleteFolderList(user.HomeDir+"/.config/goclitr/dirs.json", dir)
+	fmt.Println("Removed local directory from your project list.")
+}
+
 // -----------------
 // Main: Handle command line inputs
 // -----------------
@@ -86,17 +128,33 @@ func main() {
 
 	if len(args) == 0 && jbasefuncs.FileExists(".goclitr") == false { // If
 		goclitrtexts.PrintHelp()
-		goclitrtexts.ListIssues()
+		fmt.Printf("\n--------------------------\n\n")
+		goclitrtexts.ListProjects()
 	} else if len(args) == 0 {
 		goclitrtexts.ListIssues()
+	} else if jbasefuncs.HandleCmdInput(args, []string{"list"}) {
+		goclitrtexts.ListIssues()
+	} else if jbasefuncs.HandleCmdInput(args, []string{"completed"}) {
+		goclitrtexts.ListCompleted()
 	} else if jbasefuncs.HandleCmdInput(args, []string{"init"}) {
 		initialize()
+	} else if jbasefuncs.HandleCmdInput(args, []string{"teardown"}) {
+		tearDown()
 	} else if jbasefuncs.HandleCmdInput(args, []string{"help"}) {
 		goclitrtexts.PrintHelp()
 	} else if jbasefuncs.HandleCmdInput(args, []string{"listall"}) {
 		goclitrtexts.ListProjects()
-	} else if jbasefuncs.HandleCmdInput(args, []string{"add"}) {
+	} else if jbasefuncs.HandleCmdInput(args, []string{"add"}) ||
+		jbasefuncs.HandleCmdInput(args, []string{"new"}) {
 		addTask(args[1:])
+	} else if jbasefuncs.HandleCmdInput(args, []string{"modify"}) {
+		modifyTask(args[1:], "description")
+	} else if (len(args) == 3 && args[0] == "progress" && args[3] == "10") ||
+		(len(args) == 2 && args[0] == "done") ||
+		(len(args) == 2 && args[0] == "complete") {
+		finishTask(args[1:])
+	} else if len(args) == 3 && args[0] == "progress" {
+		modifyTask(args[1:], "progress")
 	} else if jbasefuncs.HandleCmdInput(args, []string{"remove"}) ||
 		jbasefuncs.HandleCmdInput(args, []string{"delete"}) {
 		removeTask(args[1:])
