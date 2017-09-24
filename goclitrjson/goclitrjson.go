@@ -64,9 +64,9 @@ func AppendTask(filename string, toappend Task) {
 	jbasefuncs.File_put_contents(filename, ToJson(data))
 }
 
-func checkExistentTask(data []Task, key int) {
+func CheckExistentTask(data []Task, key int) {
 	// Check if there is a task with this ID.
-	if key < 0 || key > len(data) {
+	if key < 0 || key >= len(data) {
 		jbasefuncs.Die("No task with this ID existent.") //
 	}
 }
@@ -81,7 +81,7 @@ func ModifyTask(filename string, key int, toeditKey string, toedit string) bool 
 	}
 
 	data := DecodeTask(filename)
-	checkExistentTask(data, key) // Check for invalid ID.
+	CheckExistentTask(data, key) // Check for invalid ID.
 
 	// Make changes here
 	if toeditKey == "description" {
@@ -107,7 +107,7 @@ func ModifyTask(filename string, key int, toeditKey string, toedit string) bool 
 // Function for deleting a folder from the user's list.
 func RemoveTask(filename string, key int) bool {
 	data := DecodeTask(filename)
-	checkExistentTask(data, key) // Check for invalid ID.
+	CheckExistentTask(data, key) // Check for invalid ID.
 	data = append(data[:key], data[key+1:]...)
 	jbasefuncs.File_put_contents(filename, ToJson(data))
 	return true
@@ -116,7 +116,7 @@ func RemoveTask(filename string, key int) bool {
 // Function for deleting a folder from the user's list.
 func MoveTask(filenameOrigin string, filenameTarget string, key int) bool {
 	dataOrigin := DecodeTask(filenameOrigin)
-	checkExistentTask(dataOrigin, key) // Check for invalid ID.
+	CheckExistentTask(dataOrigin, key) // Check for invalid ID.
 	task := dataOrigin[key]            // Get task to transfer.
 
 	dataOrigin = append(dataOrigin[:key], dataOrigin[key+1:]...)

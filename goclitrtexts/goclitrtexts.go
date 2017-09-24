@@ -47,10 +47,11 @@ func ListIssues() {
 	//	fmt.Println(tasks)
 	for i, p := range tasks {
 		age := time.Now().Unix() - p.Entry
-		if i%2 == 1 {
+		switch {
+		case i%2 == 1:
 			fmt.Println("")
 			fmt.Printf("%2s %-8s %-30s %-10s %8s", fmt.Sprint(i), jbasefuncs.ReadableTime(age, true), p.Description, p.User, fmt.Sprint(p.Progress))
-		} else {
+		default:
 			fmt.Println("")
 			unequal.Printf("%2s %-8s %-30s %-10s %8s", fmt.Sprint(i), jbasefuncs.ReadableTime(age, true), p.Description, p.User, fmt.Sprint(p.Progress))
 		}
@@ -64,15 +65,15 @@ func ListCompleted() {
 
 	table := "%2s %-10s  %-10s %-30s %-10s"
 	headline := color.New(color.Underline)
-	headline.Printf(table, "ID", "Entry", "Duration", "Description", "User")
+	headline.Printf(table, "ID", "Entry", "Duration", "Description", "Creator")
 	unequal := color.New(color.BgYellow, color.FgBlack)
 
 	for i, p := range tasks {
 		age := p.Modified[len(p.Modified)-1] - p.Entry
-		fmt.Println("")
-		if i%2 == 1 {
+		switch {
+		case i%2 == 1:
 			fmt.Printf(table, fmt.Sprint(i), time.Unix(p.Entry, 0).Format("2006-01-02"), jbasefuncs.ReadableTime(age, true), p.Description, p.User)
-		} else {
+		default:
 			unequal.Printf(table, fmt.Sprint(i), time.Unix(p.Entry, 0).Format("2006-01-02"), jbasefuncs.ReadableTime(age, true), p.Description, p.User)
 		}
 	}
@@ -91,12 +92,51 @@ func ListProjects() {
 	unequal := color.New(color.BgYellow, color.FgBlack)
 
 	for i, p := range folders {
-		if i%2 == 1 {
+		switch {
+		case i%2 == 1:
 			fmt.Printf("\n%-6s %-40s", fmt.Sprint(i), p)
-		} else {
+		default:
 			unequal.Printf("\n%-6s %-40s", fmt.Sprint(i), p)
 		}
 
 	}
 	fmt.Println("")
+}
+
+// Printing details of a task
+func PrintTasks(task goclitrjson.Task) {
+	fmt.Println("Details ...")
+
+	table := "%-20s %-20s"
+	headline := color.New(color.Underline)
+	headline.Printf(table, "Name", "Value")
+	unequal := color.New(color.BgYellow, color.FgBlack)
+
+	fmt.Printf("\n"+table+"\n", "Description", task.Description)
+	unequal.Printf(table, "Creator", task.User)
+	fmt.Printf("\n"+table, "Entry", time.Unix(task.Entry, 0).Format("2006-01-15"))
+
+	for i, p := range task.Modified {
+		fmt.Println("")
+		switch {
+		case i%2 == 1:
+			fmt.Printf(table, "Modification #"+fmt.Sprint(i), time.Unix(p, 0).Format("2006-01-15"))
+		default:
+			unequal.Printf(table, "Modification #"+fmt.Sprint(i), time.Unix(p, 0).Format("2006-01-15"))
+		}
+	}
+
+	headline.Printf("\n\nProgress\n")
+	progressbar := ""
+	for i := 0; i <= 10; i++ {
+		switch {
+		case i < task.Progress:
+			progressbar += "==="
+		case i == task.Progress:
+			progressbar += "==>"
+		case i > task.Progress:
+			progressbar += "———"
+		}
+	}
+	fmt.Printf("\n%-33s %2s / %2s\n\n", progressbar, fmt.Sprint(task.Progress), "10")
 }

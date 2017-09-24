@@ -57,8 +57,7 @@ func modifyTask(args []string, tomodify string) {
 	// Convert the first left over argument to int
 	id, err := strconv.Atoi(args[0])
 	if err != nil {
-		fmt.Println("You did not provide a valid ID.")
-		os.Exit(1)
+		jbasefuncs.Die("You did not provide a valid ID.")
 	}
 	description := jbasefuncs.JoinSlice(" ", args[1:]) // Join arguments to description string.
 	if goclitrjson.ModifyTask(".goclitr/pending.json", id, tomodify, description) {
@@ -71,8 +70,7 @@ func finishTask(args []string) {
 	// Convert the first left over argument to int
 	id, err := strconv.Atoi(args[0])
 	if err != nil {
-		fmt.Println("You did not provide a valid ID.")
-		os.Exit(1)
+		jbasefuncs.Die("You did not provide a valid ID.")
 	}
 	if goclitrjson.ModifyTask(".goclitr/pending.json", id, "progress", "10") {
 		fmt.Println("Modified: progress >> 10")
@@ -90,8 +88,7 @@ func removeTask(args []string) {
 	for _, argument := range args {
 		arg, err := strconv.Atoi(argument)
 		if err != nil {
-			fmt.Println("One of the arguments you provided could not be converted to int.")
-			os.Exit(1)
+			jbasefuncs.Die("One of the arguments you provided could not be converted to int.")
 		}
 		ids = append(ids, arg)
 	}
@@ -131,6 +128,18 @@ func showProjectDir(args []string) {
 	fmt.Println(targetDir)
 }
 
+// Function to select a task to be displayed in detail.
+
+func showIssue(args []string) {
+	key, err := strconv.Atoi(args[0])
+	if err != nil {
+		jbasefuncs.Die("Invalid ID")
+	}
+	task := goclitrjson.DecodeTask(".goclitr/pending.json")
+	goclitrjson.CheckExistentTask(task, key)
+	goclitrtexts.PrintTasks(task[key])
+}
+
 // -----------------
 // Main: Handle command line inputs
 // -----------------
@@ -140,42 +149,44 @@ func main() {
 
 	args := os.Args[1:]
 
-	if len(args) == 0 && jbasefuncs.FileExists(".goclitr") == false { // If
+	switch {
+	case len(args) == 0 && jbasefuncs.FileExists(".goclitr") == false:
 		goclitrtexts.PrintHelp()
 		fmt.Printf("\n--------------------------\n\n")
 		goclitrtexts.ListProjects()
-	} else if len(args) == 0 {
+	case len(args) == 0:
 		goclitrtexts.ListIssues()
-	} else if jbasefuncs.HandleCmdInput(args, []string{"list"}) {
+	case jbasefuncs.HandleCmdInput(args, []string{"list"}):
 		goclitrtexts.ListIssues()
-	} else if jbasefuncs.HandleCmdInput(args, []string{"completed"}) {
+	case jbasefuncs.HandleCmdInput(args, []string{"completed"}):
 		goclitrtexts.ListCompleted()
-	} else if jbasefuncs.HandleCmdInput(args, []string{"init"}) {
+	case jbasefuncs.HandleCmdInput(args, []string{"init"}):
 		initialize()
-	} else if jbasefuncs.HandleCmdInput(args, []string{"teardown"}) {
+	case jbasefuncs.HandleCmdInput(args, []string{"teardown"}):
 		tearDown()
-	} else if jbasefuncs.HandleCmdInput(args, []string{"help"}) {
+	case jbasefuncs.HandleCmdInput(args, []string{"help"}):
 		goclitrtexts.PrintHelp()
-	} else if jbasefuncs.HandleCmdInput(args, []string{"listall"}) {
+	case jbasefuncs.HandleCmdInput(args, []string{"listall"}):
 		goclitrtexts.ListProjects()
-	} else if jbasefuncs.HandleCmdInput(args, []string{"add"}) ||
-		jbasefuncs.HandleCmdInput(args, []string{"new"}) {
+	case jbasefuncs.HandleCmdInput(args, []string{"add"}) ||
+		jbasefuncs.HandleCmdInput(args, []string{"new"}):
 		addTask(args[1:])
-	} else if jbasefuncs.HandleCmdInput(args, []string{"modify"}) {
+	case jbasefuncs.HandleCmdInput(args, []string{"modify"}):
 		modifyTask(args[1:], "description")
-	} else if len(args) == 2 && args[0] == "project" {
+	case len(args) == 2 && args[0] == "project":
 		showProjectDir(args[1:])
-	} else if (len(args) == 3 && args[0] == "progress" && args[3] == "10") ||
+	case len(args) == 2 && args[0] == "show":
+		showIssue(args[1:])
+	case (len(args) == 3 && args[0] == "progress" && args[2] == "10") ||
 		(len(args) == 2 && args[0] == "done") ||
-		(len(args) == 2 && args[0] == "complete") {
+		(len(args) == 2 && args[0] == "complete"):
 		finishTask(args[1:])
-	} else if len(args) == 3 && args[0] == "progress" {
+	case len(args) == 3 && args[0] == "progress":
 		modifyTask(args[1:], "progress")
-	} else if jbasefuncs.HandleCmdInput(args, []string{"remove"}) ||
-		jbasefuncs.HandleCmdInput(args, []string{"delete"}) {
+	case jbasefuncs.HandleCmdInput(args, []string{"remove"}) ||
+		jbasefuncs.HandleCmdInput(args, []string{"delete"}):
 		removeTask(args[1:])
-	} else {
+	default:
 		fmt.Println("Unknown command: " + args[0])
 	}
-
 }
