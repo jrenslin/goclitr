@@ -44,22 +44,21 @@ func ListIssues() {
 	tasks := goclitrjson.DecodeTask(".goclitr/pending.json")
 
 	// Formatting
+	table := "%2s %-8s %-30s %-10s %8s %11s"
 	headline := color.New(color.Underline)
 	unequal := color.New(color.BgYellow, color.FgBlack)
 
-	headline.Printf("%2s %-8s %-30s %-10s %-8s", "ID", "Age", "Description", "User", "Progress")
+	headline.Printf(table, "ID", "Age", "Description", "User", "Progress", "Annotations")
 	for i, p := range tasks {
 		age := time.Now().Unix() - p.Entry
 		fmt.Println("") // Without this, the background color would fill the entire line.
 		switch {
 		case i%2 == 1:
-			fmt.Printf("%2s %-8s %-30s %-10s %8s", fmt.Sprint(i),
-				jbasefuncs.ReadableTime(age, true), p.Description,
-				p.User, fmt.Sprint(p.Progress))
+			fmt.Printf(table, fmt.Sprint(i), jbasefuncs.ReadableTime(age, true), p.Description,
+				p.User, fmt.Sprint(p.Progress), fmt.Sprint(len(p.Annotation)))
 		default:
-			unequal.Printf("%2s %-8s %-30s %-10s %8s", fmt.Sprint(i),
-				jbasefuncs.ReadableTime(age, true), p.Description,
-				p.User, fmt.Sprint(p.Progress))
+			unequal.Printf(table, fmt.Sprint(i), jbasefuncs.ReadableTime(age, true), p.Description,
+				p.User, fmt.Sprint(p.Progress), fmt.Sprint(len(p.Annotation)))
 		}
 	}
 	fmt.Println("")
