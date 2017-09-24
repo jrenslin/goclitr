@@ -40,7 +40,7 @@ func initialize() {
 	jbasefuncs.EnsureDir(".goclitr")
 	jbasefuncs.EnsureJsonList(".goclitr/pending.json")
 	jbasefuncs.EnsureJsonList(".goclitr/completed.json")
-	addDirtoList()
+	addDirtoList() // Add current directory to user's project list
 }
 
 // Function to add new tasks. Creates the task and passes the json-related work to AppendTask from goclitrjson.go.
@@ -48,8 +48,9 @@ func addTask(args []string) {
 	description := jbasefuncs.JoinSlice(" ", args) // Join arguments to description string.
 	username, _ := user.Current()                  // Get username to later store it.
 
-	newtask := goclitrjson.Task{Description: description, User: username.Username, Entry: time.Now().Unix()}
-	goclitrjson.AppendTask(".goclitr/pending.json", newtask)
+	task := goclitrjson.Task{Description: description, User: username.Username, Entry: time.Now().Unix()}
+	goclitrjson.AppendTask(".goclitr/pending.json", task)
+	addDirtoList() // Add current directory to user's project list
 }
 
 // Function to add an annotation for a task.
@@ -59,11 +60,11 @@ func annotateTask(args []string) {
 		jbasefuncs.Die("You did not provide a valid ID.")
 	}
 	text := jbasefuncs.JoinSlice(" ", args[1:]) // Join arguments to description string.
-
-	username, _ := user.Current() // Get username to later store it.
+	username, _ := user.Current()               // Get username to later store it.
 
 	annotation := goclitrjson.Annotation{Text: text, User: username.Username, Entry: time.Now().Unix()}
 	goclitrjson.AddAnnotation(".goclitr/pending.json", id, annotation)
+	addDirtoList() // Add current directory to user's project list
 }
 
 // Function for modifying tasks
@@ -77,6 +78,7 @@ func modifyTask(args []string, tomodify string) {
 	if goclitrjson.ModifyTask(".goclitr/pending.json", id, tomodify, description) {
 		fmt.Println("Modified: " + tomodify + " >> " + args[1])
 	}
+	addDirtoList() // Add current directory to user's project list
 }
 
 // Function for modifying tasks
@@ -90,6 +92,7 @@ func finishTask(args []string) {
 		fmt.Println("Modified: progress >> 10")
 	}
 	goclitrjson.MoveTask(".goclitr/pending.json", ".goclitr/completed.json", id)
+	addDirtoList() // Add current directory to user's project list
 }
 
 // Function to delete a task by ID.
@@ -112,6 +115,7 @@ func removeTask(args []string) {
 		goclitrjson.RemoveTask(".goclitr/pending.json", id)
 		fmt.Println("Removed task #" + fmt.Sprint(id))
 	}
+	addDirtoList() // Add current directory to user's project list
 }
 
 // Function to tear down local tasklist.
