@@ -14,8 +14,11 @@ import (
 func PrintHelp() {
 	fmt.Println("Goclitr v.0.1 \n ")
 
+	// Formatting
 	table := "%-12s %-4s %-12s %-20s \n"
 	headline := color.New(color.Underline)
+
+	// Print Table
 	headline.Printf(table, "Command", "", "", "Description")
 	fmt.Printf(table, "init", "", "", "Initialize")
 	fmt.Printf(table, "teardown", "", "", "Tear down")
@@ -40,20 +43,23 @@ func PrintHelp() {
 func ListIssues() {
 	tasks := goclitrjson.DecodeTask(".goclitr/pending.json")
 
+	// Formatting
 	headline := color.New(color.Underline)
-	headline.Printf("%2s %-8s %-30s %-10s %-8s", "ID", "Age", "Description", "User", "Progress")
 	unequal := color.New(color.BgYellow, color.FgBlack)
 
-	//	fmt.Println(tasks)
+	headline.Printf("%2s %-8s %-30s %-10s %-8s", "ID", "Age", "Description", "User", "Progress")
 	for i, p := range tasks {
 		age := time.Now().Unix() - p.Entry
+		fmt.Println("") // Without this, the background color would fill the entire line.
 		switch {
 		case i%2 == 1:
-			fmt.Println("")
-			fmt.Printf("%2s %-8s %-30s %-10s %8s", fmt.Sprint(i), jbasefuncs.ReadableTime(age, true), p.Description, p.User, fmt.Sprint(p.Progress))
+			fmt.Printf("%2s %-8s %-30s %-10s %8s", fmt.Sprint(i),
+				jbasefuncs.ReadableTime(age, true), p.Description,
+				p.User, fmt.Sprint(p.Progress))
 		default:
-			fmt.Println("")
-			unequal.Printf("%2s %-8s %-30s %-10s %8s", fmt.Sprint(i), jbasefuncs.ReadableTime(age, true), p.Description, p.User, fmt.Sprint(p.Progress))
+			unequal.Printf("%2s %-8s %-30s %-10s %8s", fmt.Sprint(i),
+				jbasefuncs.ReadableTime(age, true), p.Description,
+				p.User, fmt.Sprint(p.Progress))
 		}
 	}
 	fmt.Println("")
@@ -63,6 +69,7 @@ func ListIssues() {
 func ListCompleted() {
 	tasks := goclitrjson.DecodeTask(".goclitr/completed.json")
 
+	// Formatting
 	table := "%2s %-10s  %-10s %-30s %-10s"
 	headline := color.New(color.Underline)
 	headline.Printf(table, "ID", "Entry", "Duration", "Description", "Creator")
@@ -70,11 +77,14 @@ func ListCompleted() {
 
 	for i, p := range tasks {
 		age := p.Modified[len(p.Modified)-1] - p.Entry
+		fmt.Println("") // Without this, the background color would fill the entire line.
 		switch {
 		case i%2 == 1:
-			fmt.Printf(table, fmt.Sprint(i), time.Unix(p.Entry, 0).Format("2006-01-02"), jbasefuncs.ReadableTime(age, true), p.Description, p.User)
+			fmt.Printf(table, fmt.Sprint(i), time.Unix(p.Entry, 0).Format("2006-01-02"),
+				jbasefuncs.ReadableTime(age, true), p.Description, p.User)
 		default:
-			unequal.Printf(table, fmt.Sprint(i), time.Unix(p.Entry, 0).Format("2006-01-02"), jbasefuncs.ReadableTime(age, true), p.Description, p.User)
+			unequal.Printf(table, fmt.Sprint(i), time.Unix(p.Entry, 0).Format("2006-01-02"),
+				jbasefuncs.ReadableTime(age, true), p.Description, p.User)
 		}
 	}
 	fmt.Println("")
@@ -87,16 +97,18 @@ func ListProjects() {
 
 	fmt.Println("You've worked on the following " + fmt.Sprint(len(folders)) + " projects\n ")
 
+	// Formatting
 	headline := color.New(color.Underline)
-	headline.Printf("%-6s %-40s", "ID", "Path")
 	unequal := color.New(color.BgYellow, color.FgBlack)
 
+	headline.Printf("%-6s %-40s", "ID", "Path")
 	for i, p := range folders {
+		fmt.Println("") // Without this, the background color would fill the entire line.
 		switch {
 		case i%2 == 1:
-			fmt.Printf("\n%-6s %-40s", fmt.Sprint(i), p)
+			fmt.Printf("%-6s %-40s", fmt.Sprint(i), p)
 		default:
-			unequal.Printf("\n%-6s %-40s", fmt.Sprint(i), p)
+			unequal.Printf("%-6s %-40s", fmt.Sprint(i), p)
 		}
 
 	}
@@ -107,26 +119,29 @@ func ListProjects() {
 func PrintTasks(task goclitrjson.Task) {
 	fmt.Println("Details ...")
 
+	// Formatting
 	table := "%-20s %-20s"
 	headline := color.New(color.Underline)
-	headline.Printf(table, "Name", "Value")
 	unequal := color.New(color.BgYellow, color.FgBlack)
 
+	// Print table
+	headline.Printf(table, "Name", "Value")
 	fmt.Printf("\n"+table+"\n", "Description", task.Description)
 	unequal.Printf(table, "Creator", task.User)
-	fmt.Printf("\n"+table, "Entry", time.Unix(task.Entry, 0).Format("2006-01-15"))
+	fmt.Printf("\n"+table, "Entry", time.Unix(task.Entry, 0).Format("2006-01-02"))
 
 	for i, p := range task.Modified {
 		fmt.Println("")
 		switch {
 		case i%2 == 1:
-			fmt.Printf(table, "Modification #"+fmt.Sprint(i), time.Unix(p, 0).Format("2006-01-15"))
+			fmt.Printf(table, "Modification #"+fmt.Sprint(i), time.Unix(p, 0).Format("2006-01-02 15:04"))
 		default:
-			unequal.Printf(table, "Modification #"+fmt.Sprint(i), time.Unix(p, 0).Format("2006-01-15"))
+			unequal.Printf(table, "Modification #"+fmt.Sprint(i), time.Unix(p, 0).Format("2006-01-02 15:04"))
 		}
 	}
 
-	headline.Printf("\n\nProgress\n")
+	// Generate progress bar and print it
+	headline.Println("\n\nProgress")
 	progressbar := ""
 	for i := 0; i <= 10; i++ {
 		switch {
@@ -139,4 +154,12 @@ func PrintTasks(task goclitrjson.Task) {
 		}
 	}
 	fmt.Printf("\n%-33s %2s / %2s\n\n", progressbar, fmt.Sprint(task.Progress), "10")
+
+	// Print annotations
+	headline.Println("Annotations")
+	for _, p := range task.Annotation {
+		fmt.Printf("\n %s wrote on %s: \n", p.User, time.Unix(p.Entry, 0).Format("2006-01-02 15:04"))
+		fmt.Println(p.Text)
+	}
+
 }

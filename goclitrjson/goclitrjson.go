@@ -1,5 +1,5 @@
 // -----------------
-// The JSON backend to goclitr can be found in this file.
+// JSON-based backend for goclitr.
 // -----------------
 package goclitrjson
 
@@ -30,20 +30,28 @@ func ToJson(p interface{}) string {
 // -----------------
 
 type Task struct {
-	Description string   `json:"description"`
-	User        string   `json:"user"`
-	Uuid        string   `json:"uuid"`
-	Status      string   `json:"status"`
-	Entry       int64    `json:"entry"`
-	End         int64    `json:"end"`
-	Due         int64    `json:"due"`
-	Progress    int      `json:"progress"`
-	Annotation  []string `json:"annotation"`
-	Modified    []int64  `json:"modified"`
+	Description string       `json:"description"`
+	User        string       `json:"user"`
+	Uuid        string       `json:"uuid"`
+	Status      string       `json:"status"`
+	Entry       int64        `json:"entry"`
+	End         int64        `json:"end"`
+	Due         int64        `json:"due"`
+	Progress    int          `json:"progress"`
+	Annotation  []Annotation `json:"annotation"`
+	Modified    []int64      `json:"modified"`
 }
 
 func (p Task) ToString() string {
 	return ToJson(p)
+}
+
+// Annotations
+
+type Annotation struct {
+	Text  string
+	User  string
+	Entry int64
 }
 
 // Function for decoding the task list.
@@ -61,6 +69,14 @@ func DecodeTask(filename string) []Task {
 func AppendTask(filename string, toappend Task) {
 	data := DecodeTask(filename)
 	data = append(data, toappend)
+	jbasefuncs.File_put_contents(filename, ToJson(data))
+}
+
+// Function for appending a task to the local task list.
+func AddAnnotation(filename string, key int, annotation Annotation) {
+	data := DecodeTask(filename)
+	CheckExistentTask(data, key) // Check for invalid ID.
+	data[key].Annotation = append(data[key].Annotation, annotation)
 	jbasefuncs.File_put_contents(filename, ToJson(data))
 }
 

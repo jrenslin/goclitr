@@ -52,6 +52,20 @@ func addTask(args []string) {
 	goclitrjson.AppendTask(".goclitr/pending.json", newtask)
 }
 
+// Function to add an annotation for a task.
+func annotateTask(args []string) {
+	id, err := strconv.Atoi(args[0])
+	if err != nil {
+		jbasefuncs.Die("You did not provide a valid ID.")
+	}
+	text := jbasefuncs.JoinSlice(" ", args[1:]) // Join arguments to description string.
+
+	username, _ := user.Current() // Get username to later store it.
+
+	annotation := goclitrjson.Annotation{Text: text, User: username.Username, Entry: time.Now().Unix()}
+	goclitrjson.AddAnnotation(".goclitr/pending.json", id, annotation)
+}
+
 // Function for modifying tasks
 func modifyTask(args []string, tomodify string) {
 	// Convert the first left over argument to int
@@ -119,7 +133,6 @@ func tearDown() {
 // By returning the path, this function makes it easy to jump projects with a little bash.
 // E.g.:
 // cd `~/Sync/Programming/Golang/goclitr/goclitr goto 1`
-
 func showProjectDir(args []string) {
 	user, _ := user.Current()
 	folders := goclitrjson.DecodeFolderList(user.HomeDir + "/.config/goclitr/dirs.json")
@@ -129,7 +142,6 @@ func showProjectDir(args []string) {
 }
 
 // Function to select a task to be displayed in detail.
-
 func showIssue(args []string) {
 	key, err := strconv.Atoi(args[0])
 	if err != nil {
@@ -177,6 +189,8 @@ func main() {
 		showProjectDir(args[1:])
 	case len(args) == 2 && args[0] == "show":
 		showIssue(args[1:])
+	case len(args) >= 2 && args[0] == "annotate":
+		annotateTask(args[1:])
 	case (len(args) == 3 && args[0] == "progress" && args[2] == "10") ||
 		(len(args) == 2 && args[0] == "done") ||
 		(len(args) == 2 && args[0] == "complete"):
