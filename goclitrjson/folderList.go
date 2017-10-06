@@ -11,7 +11,7 @@ import (
 
 // Function for decoding the folder list.
 func DecodeFolderList(filename string) []string {
-	file := jbasefuncs.File_get_contents_bytes(filename)
+	file := jbasefuncs.FileGetContentsBytes(filename)
 
 	var data []string
 	err := json.Unmarshal(file, &data)
@@ -26,7 +26,7 @@ func AppendFolderList(filename string, toappend string) {
 	data := DecodeFolderList(filename)
 	data = append(data, toappend)
 	data = jbasefuncs.ArrayStringUnique(data)
-	jbasefuncs.File_put_contents(filename, ToJson(data))
+	jbasefuncs.FilePutContents(filename, ToJson(data))
 }
 
 // Function for remove a folder from the user's list.
@@ -43,5 +43,5 @@ func DeleteFolderList(filename string, toRemove string) {
 		jbasefuncs.Die("Directory not found for removal.")
 	}
 	data = append(data[:key], data[key+1:]...)
-	jbasefuncs.File_put_contents(filename, ToJson(data))
+	jbasefuncs.FilePutContents(filename, ToJson(data))
 }

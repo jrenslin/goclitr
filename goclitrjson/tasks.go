@@ -37,7 +37,7 @@ type Annotation struct {
 
 // Function for decoding the task list.
 func DecodeTask(filename string) []Task {
-	file := jbasefuncs.File_get_contents_bytes(filename)
+	file := jbasefuncs.FileGetContentsBytes(filename)
 
 	var data []Task
 	err := json.Unmarshal(file, &data)
@@ -50,7 +50,7 @@ func DecodeTask(filename string) []Task {
 func AppendTask(filename string, toappend Task) {
 	data := DecodeTask(filename)
 	data = append(data, toappend)
-	jbasefuncs.File_put_contents(filename, ToJson(data))
+	jbasefuncs.FilePutContents(filename, ToJson(data))
 }
 
 // Function for appending a task to the local task list.
@@ -58,7 +58,7 @@ func AddAnnotation(filename string, key int, annotation Annotation) {
 	data := DecodeTask(filename)
 	CheckExistentTask(data, key) // Check for invalid ID.
 	data[key].Annotation = append(data[key].Annotation, annotation)
-	jbasefuncs.File_put_contents(filename, ToJson(data))
+	jbasefuncs.FilePutContents(filename, ToJson(data))
 }
 
 func CheckExistentTask(data []Task, key int) {
@@ -96,7 +96,7 @@ func ModifyTask(filename string, key int, toeditKey string, toedit string) bool 
 	}
 
 	data[key].Modified = append(data[key].Modified, time.Now().Unix())
-	jbasefuncs.File_put_contents(filename, ToJson(data))
+	jbasefuncs.FilePutContents(filename, ToJson(data))
 
 	return true
 }
@@ -106,7 +106,7 @@ func RemoveTask(filename string, key int) bool {
 	data := DecodeTask(filename)
 	CheckExistentTask(data, key) // Check for invalid ID.
 	data = append(data[:key], data[key+1:]...)
-	jbasefuncs.File_put_contents(filename, ToJson(data))
+	jbasefuncs.FilePutContents(filename, ToJson(data))
 	return true
 }
 
@@ -117,11 +117,11 @@ func MoveTask(filenameOrigin string, filenameTarget string, key int) bool {
 	task := dataOrigin[key]            // Get task to transfer.
 
 	dataOrigin = append(dataOrigin[:key], dataOrigin[key+1:]...)
-	jbasefuncs.File_put_contents(filenameOrigin, ToJson(dataOrigin))
+	jbasefuncs.FilePutContents(filenameOrigin, ToJson(dataOrigin))
 
 	dataTarget := DecodeTask(filenameTarget)
 	dataTarget = append(dataTarget, task)
-	jbasefuncs.File_put_contents(filenameTarget, ToJson(dataTarget))
+	jbasefuncs.FilePutContents(filenameTarget, ToJson(dataTarget))
 
 	return true
 }
