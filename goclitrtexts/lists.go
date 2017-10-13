@@ -3,7 +3,7 @@ package goclitrtexts
 
 import (
 	"../goclitrjson"
-	"../jbasefuncs"
+	jbasefuncs "github.com/jrenslin/jbasefuncs"
 	"fmt"
 	color "github.com/fatih/color"
 	"os/user"

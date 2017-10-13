@@ -4,7 +4,7 @@
 package goclitrjson
 
 import (
-	"../jbasefuncs"
+	jbasefuncs "github.com/jrenslin/jbasefuncs"
 	"encoding/json"
 )
 

@@ -7,7 +7,7 @@ package main
 import (
 	"./goclitrjson"
 	"./goclitrtexts"
-	"./jbasefuncs"
+	jbasefuncs "github.com/jrenslin/jbasefuncs"
 	"fmt"
 	"os"
 	"os/user"
