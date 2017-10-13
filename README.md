@@ -33,6 +33,20 @@ listall                                Lists all projects you've worked on
 project      <Project ID>              Return path of project X
 ```
 
+## Requirements
+
+To build goclitr, the following packages need to be installed:
+
+- Color (https://github.com/fatih/color)
+- jbasefuncs (https://github.com/jrenslin/jbasefuncs)
+
+Run:
+
+```
+go get github.com/fatih/color
+go get github.com/jrenslin/jbasefuncs
+```
+
 ## Inspiration / Thanks
 
 - [Taskwarrior](https://taskwarrior.org)
